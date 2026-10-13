@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getCategories, WC_URL } from '../lib/woo';
 
-const LOGO = `${WC_URL}/wp-content/uploads/2026/08/${encodeURIComponent('לוגו-שקוף')}.png`;
+const LOGO = `${WC_URL}/wp-content/uploads/2026/08/${encodeURIComponent('לוגו-שקוף-150x150')}.png`;
 
 export async function Header() {
   let cats = [];
@@ -13,7 +13,7 @@ export async function Header() {
   return (
     <header className="hdr">
       <div className="wrap hdr-top">
-        <Link href="/" className="hdr-logo" aria-label="צ'וקי — דף הבית"><img src={LOGO} alt="צ'וקי" width="120" height="44" /></Link>
+        <Link href="/" className="hdr-logo" aria-label="צ'וקי — דף הבית"><img src={LOGO} alt="צ'וקי" width="60" height="60" /></Link>
         <form className="hdr-search" action="/search" role="search">
           <label className="sr" htmlFor="q">חיפוש מוצרים</label>
           <input id="q" name="q" type="search" placeholder="מה מחפשים היום?" autoComplete="off" />
