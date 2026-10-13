@@ -9,7 +9,7 @@ export async function GET(req) {
   if (url.search) return handle(req); // דף הבית עם פרמטרים (חיפוש, פעולות) — עובר לווקומרס
   try {
     const p = await buildFromWp('/');
-    return htmlResponse(documentHtml({ ...p, body: p.body.innerHTML }));
+    return htmlResponse(documentHtml({ ...p, body: p.body.innerHTML }), { status: p.status });
   } catch (e) {
     return handle(req);
   }
