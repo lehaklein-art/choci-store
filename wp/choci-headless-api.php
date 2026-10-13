@@ -559,7 +559,7 @@ function chx_singular() {
         'comment_count' => (int) get_comments_number($id),
         'cat_ids' => is_singular('post') ? wp_get_post_categories($id) : array(),
         'related' => is_singular('post') ? chx_related_posts($id) : array(),
-        'jsonld' => is_singular('post') ? chx_recipe_jsonld($id) : null,
+        'jsonld_raw' => is_singular('post') ? chx_extra_jsonld() : array(),
         'template' => get_page_template_slug($id),
     );
 }
@@ -652,4 +652,16 @@ function chx_recipe_jsonld($id) {
     $d['recipeCategory'] = 'קינוח';
     $d['recipeCuisine'] = 'קונדיטוריה';
     return $d;
+}
+
+/* נתונים מובנים נוספים (מתכון) שתוספים מוסיפים לראש העמוד — רק ה-JSON, לא שום HTML אחר */
+function chx_extra_jsonld() {
+    ob_start();
+    do_action('wp_head');
+    $h = ob_get_clean();
+    $out = array();
+    if (preg_match_all('#<script type="application/ld\+json"(?![^>]*rank-math)[^>]*>(.*?)</script>#s', $h, $m)) {
+        foreach ($m[1] as $j) { $d = json_decode(trim($j), true); if ($d) { $out[] = $d; } }
+    }
+    return $out;
 }
