@@ -1,6 +1,7 @@
-/** כתובות עם / בסוף — בדיוק כמו בווקומרס, כדי שגוגל וההפניות ימשיכו לעבוד */
+/** הכתובות עוברות כמו שהן, בלי שינוי — בדיוק כמו באתר המקורי */
 const nextConfig = {
-  trailingSlash: true,
+  trailingSlash: false,
+  skipTrailingSlashRedirect: true,
   poweredByHeader: false,
   compress: true,
 };
