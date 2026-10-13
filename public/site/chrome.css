@@ -210,17 +210,6 @@
 .choci-shipbar b{color:#fff;text-decoration:underline}
 .choci-shipbar.is-free{background:#1F7A46}
 @media(max-width:560px){.ccart{top:8px;right:8px;left:8px;width:auto;max-width:none;max-height:82vh}.ccart-list{max-height:34vh}.choci-shipbar{font-size:14.5px;padding:11px 12px;margin-bottom:14px}}
-.cf-btn{display:none}
-@media(max-width:768px){
- .cf-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 14px;background:#573D2F;color:#fff;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
- .cf-btn[aria-expanded="true"]{background:#F05B5B}
- #secondary.cf-moved{display:none!important;position:static!important;max-width:none!important;flex:none!important;width:100%!important;background:#FFF8F3;border-radius:14px;padding:16px 16px 4px;margin:0 0 16px}
- #secondary.cf-moved.cf-open{display:block!important}
- #secondary .cf-order{display:block!important;margin:0 0 18px}
- #secondary .cf-order form.woocommerce-ordering{display:block!important;float:none;margin:0}
- #secondary .cf-order select{width:100%;border:1.5px solid #E6DAD3;border-radius:10px;padding:10px 12px;font-size:15px;color:#573D2F;background:#fff}
- #secondary .cf-order-title{font-size:16px;font-weight:700;color:#573D2F;margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid #F05B5B}
-}
 .ico-burger{cursor:pointer}
 .cmnav-ov{position:fixed;inset:0;background:rgba(58,32,16,.45);z-index:100001;opacity:0;transition:opacity .2s}
 .cmnav-ov.on{opacity:1}
