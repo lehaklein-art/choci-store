@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '6');
+define('CHX_VERSION', '7');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -560,11 +560,47 @@ function chx_singular() {
         'next' => $next ? array('title' => get_the_title($next), 'link' => chx_rel(get_permalink($next))) : null,
         'comments_open' => comments_open($id),
         'comment_count' => (int) get_comments_number($id),
+        'comments' => (is_singular('post') && get_comments_number($id)) ? chx_comments($id) : array(),
         'cat_ids' => is_singular('post') ? wp_get_post_categories($id) : array(),
         'related' => is_singular('post') ? chx_related_posts($id) : array(),
         'jsonld_raw' => is_singular('post') ? chx_extra_jsonld() : array(),
         'template' => get_page_template_slug($id),
     );
+}
+
+/* תגובות מאושרות — נתונים בלבד, בסדר שבו התבנית מציגה אותן */
+function chx_comments($id) {
+    $list = get_comments(array('post_id' => $id, 'status' => 'approve', 'order' => 'ASC', 'orderby' => 'comment_date_gmt'));
+    $by = array();
+    foreach ($list as $c) { $by[(int) $c->comment_parent][] = $c; }
+    $out = array();
+    $GLOBALS['comment_alt'] = 0; $GLOBALS['comment_thread_alt'] = 0;
+    $walk = function ($parent, $depth) use (&$walk, &$by, &$out, $id) {
+        if (empty($by[$parent])) { return; }
+        foreach ($by[$parent] as $c) {
+            $GLOBALS['comment_depth'] = $depth;
+            $GLOBALS['comment'] = $c;
+            $has = !empty($by[(int) $c->comment_ID]);
+            $out[] = array(
+                'id' => (int) $c->comment_ID,
+                'parent' => (int) $c->comment_parent,
+                'depth' => $depth,
+                'classes' => implode(' ', get_comment_class($has ? 'parent' : '', $c, $id)),
+                'author' => get_comment_author($c),
+                'author_url' => get_comment_author_url($c),
+                'avatar' => get_avatar_url($c, array('size' => 60)),
+                'avatar2x' => get_avatar_url($c, array('size' => 120)),
+                'date_iso' => get_comment_date('c', $c),
+                'date_text' => sprintf(__('%1$s at %2$s'), get_comment_date('', $c), get_comment_time('', false, true, $c)),
+                'link' => chx_rel(get_comment_link($c)),
+                'content_html' => chx_rel_html(apply_filters('comment_text', get_comment_text($c), $c, array())),
+                'approved' => $c->comment_approved === '1',
+            );
+            $walk((int) $c->comment_ID, $depth + 1);
+        }
+    };
+    $walk(0, 1);
+    return $out;
 }
 
 function chx_home_rails() {
