@@ -1,5 +1,5 @@
 // דף הבית (וגם תוצאות חיפוש) — בדיוק כמו המקור, מוגש קל ומהיר
-import { buildFromWp, documentHtml, htmlResponse } from '../lib/wp';
+import { buildFromWp, documentHtml, htmlResponse, cssHref } from '../lib/wp';
 import { cached, warmOnce, normKey } from '../lib/pagecache';
 import { handle, isLive } from '../lib/mirror';
 
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 const build = (key) => async () => {
   const p = await buildFromWp(key);
-  return { html: documentHtml({ ...p, body: p.body.innerHTML }), status: p.status };
+  return { html: documentHtml({ ...p, body: p.body.innerHTML, css: await cssHref() }), status: p.status };
 };
 
 export async function GET(req) {
