@@ -1,6 +1,6 @@
 // כל עמודי האתר (קטגוריות, מוצרים, מתכונים, דפי מידע) — בדיוק כמו המקור, מוגשים קלים ומהירים.
 // עגלה, קופה, החשבון שלי ופעולות עוברים ישירות לווקומרס.
-import { buildFromWp, documentHtml, htmlResponse, cssHref } from '../../lib/wp';
+import { buildFromWp, documentHtml, htmlResponse } from '../../lib/wp';
 import { cached, normKey } from '../../lib/pagecache';
 import { handle, isLive } from '../../lib/mirror';
 
@@ -13,7 +13,7 @@ async function GET(req) {
     const key = normKey(url.pathname, url.search);
     const out = await cached(key, 60e3, async () => {
       const p = await buildFromWp(key);
-      return { html: documentHtml({ ...p, body: p.body.innerHTML, css: await cssHref() }), status: p.status };
+      return { html: documentHtml({ ...p, body: p.body.innerHTML }), status: p.status };
     });
     return htmlResponse(out.html, { status: out.status });
   } catch {

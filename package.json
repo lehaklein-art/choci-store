@@ -4,15 +4,12 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/build-css.mjs && next build",
+    "build": "next build",
     "start": "next start -p ${PORT:-3000}"
   },
   "dependencies": {
     "next": "15.3.4",
     "node-html-parser": "^6.1.13",
-    "postcss": "^8.4.49",
-    "postcss-safe-parser": "^7.0.1",
-    "purgecss": "^6.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
