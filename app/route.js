@@ -1,6 +1,6 @@
 // דף הבית (וגם תוצאות חיפוש) — בדיוק כמו המקור, מוגש קל ומהיר
 import { buildFromWp, documentHtml, htmlResponse } from '../lib/wp';
-import { cached, warmOnce } from '../lib/pagecache';
+import { cached, warmOnce, normKey } from '../lib/pagecache';
 import { handle, isLive } from '../lib/mirror';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ export async function GET(req) {
   const url = new URL(req.url);
   if (isLive(req, url)) return handle(req);
   try {
-    const key = '/' + url.search;
+    const key = normKey('/', url.search);
     const out = await cached(key, 60e3, build(key));
     // בפעם הראשונה אחרי עלייה: מכינים מראש ברקע את כל עמודי הקטגוריות שבתפריט
     if (key === '/') warmOnce(out.html, (k) => cached(k, 60e3, build(k)));
