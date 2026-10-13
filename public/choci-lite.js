@@ -169,8 +169,11 @@
       if (!loop && (i < 0 || i >= slides.length)) return;
       cur = (i + slides.length) % slides.length;
       if (nav && !loop) {
-        nav.querySelector('.flex-prev').classList.toggle('flex-disabled', cur === 0);
-        nav.querySelector('.flex-next').classList.toggle('flex-disabled', cur === slides.length - 1);
+        // כמו במקור: חץ בקצה מקבל flex-disabled ו-tabindex=-1
+        [[nav.querySelector('.flex-prev'), cur === 0], [nav.querySelector('.flex-next'), cur === slides.length - 1]].forEach(function (x) {
+          x[0].classList.toggle('flex-disabled', x[1]);
+          if (x[1]) x[0].setAttribute('tabindex', '-1'); else x[0].removeAttribute('tabindex');
+        });
       }
       slides.forEach(function (s, k) { s.classList.toggle('flex-active-slide', k === cur); });
       $$('img', thumbs).forEach(function (t, k) { t.classList.toggle('flex-active', k === cur); });
