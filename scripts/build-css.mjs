@@ -52,6 +52,8 @@ try {
   // אם הקיצוץ נכשל — עדיף העיצוב המלא מאשר אתר בלי עיצוב
   css = full || (fs.existsSync(out) ? fs.readFileSync(out, 'utf8') : '');
 }
+// עותק של קובץ המקור — השרת משתמש בו כדי לדעת איזה עיצוב כבר נמצא בקובץ המשותף (חייב להתאים לבנייה)
+if (full) { fs.mkdirSync('.choci', { recursive: true }); fs.writeFileSync('.choci/site-source.css', full); }
 if (css) {
   fs.writeFileSync(out, css);
   fs.writeFileSync('lib/css-version.json', JSON.stringify({ v: createHash('sha1').update(css).digest('hex').slice(0, 10), note }));
