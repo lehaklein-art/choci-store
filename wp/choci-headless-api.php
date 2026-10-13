@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '2');
+define('CHX_VERSION', '3');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -67,6 +67,9 @@ function chx_page() {
     if (function_exists('is_product_category') && (is_product_category() || is_shop() || is_product_tag() || (is_search() && get_query_var('post_type') === 'product'))) {
         $out['type'] = 'archive';
         $out['archive'] = chx_archive();
+    } elseif (function_exists('is_product') && is_product()) {
+        $out['type'] = 'product';
+        $out['product'] = chx_product(wc_get_product(get_queried_object_id()));
     } else {
         $out['type'] = 'other';
     }
@@ -358,4 +361,149 @@ function chx_price_widget($inst) {
     }
     return array('kind' => 'price_filter', 'title' => isset($inst['title']) ? $inst['title'] : '', 'step' => $step,
         'min' => $min_price, 'max' => $max_price, 'cur_min' => $current_min, 'cur_max' => $current_max, 'hidden' => $hidden);
+}
+
+/* ---------- עמוד מוצר ---------- */
+
+/** מפרק תגית img לנתונים (מקור, גדלים, טקסט חלופי...) */
+function chx_img_attrs($html) {
+    $out = array();
+    if (preg_match('/<img\b([^>]*)>/', $html, $m)) {
+        preg_match_all('/([a-zA-Z_:-]+)="([^"]*)"/', $m[1], $a, PREG_SET_ORDER);
+        foreach ($a as $x) { $out[$x[1]] = html_entity_decode($x[2], ENT_QUOTES, 'UTF-8'); }
+    }
+    return $out;
+}
+
+function chx_gallery_item($attachment_id, $main, $index, $product) {
+    // אותה פונקציה שווקומרס משתמש בה — מפרקים את התוצאה לנתונים בלבד
+    $html = wc_get_gallery_image_html($attachment_id, $main, $index);
+    $wrap = array();
+    if (preg_match('/<div\b([^>]*)>/', $html, $m)) {
+        preg_match_all('/([a-zA-Z_-]+)="([^"]*)"/', $m[1], $a, PREG_SET_ORDER);
+        foreach ($a as $x) { $wrap[$x[1]] = html_entity_decode($x[2], ENT_QUOTES, 'UTF-8'); }
+    }
+    $href = preg_match('/<a href="([^"]*)"/', $html, $h) ? html_entity_decode($h[1], ENT_QUOTES, 'UTF-8') : '';
+    return array('id' => (int) $attachment_id, 'wrap' => $wrap, 'href' => $href, 'img' => chx_img_attrs($html));
+}
+
+function chx_breadcrumbs() {
+    if (!function_exists('Kadence\kadence')) { return array(); }
+    ob_start();
+    try { Kadence\kadence()->print_breadcrumb(); } catch (\Throwable $e) {}
+    $h = ob_get_clean();
+    $items = array();
+    if (preg_match_all('/<a href="([^"]*)"[^>]*>\s*<span>(.*?)<\/span>\s*<\/a>/s', $h, $m, PREG_SET_ORDER)) {
+        foreach ($m as $x) { $items[] = array('url' => chx_rel(html_entity_decode($x[1], ENT_QUOTES, 'UTF-8')), 'name' => html_entity_decode(wp_strip_all_tags($x[2]), ENT_QUOTES, 'UTF-8')); }
+    }
+    $current = preg_match('/<span class="kadence-bread-current">(.*?)<\/span>/s', $h, $c) ? html_entity_decode(wp_strip_all_tags($c[1]), ENT_QUOTES, 'UTF-8') : '';
+    return array('items' => $items, 'current' => $current);
+}
+
+function chx_product($p) {
+    if (!$p) { return null; }
+    $id = $p->get_id();
+    global $product;
+    $product = $p;
+
+    // גלריה
+    $gallery = array();
+    $main_id = $p->get_image_id();
+    $ids = $p->get_gallery_image_ids();
+    if ($main_id) {
+        $gallery[] = chx_gallery_item($main_id, true, 0, $p);
+        foreach ($ids as $i => $gid) { $gallery[] = chx_gallery_item($gid, false, $i + 1, $p); }
+    }
+
+    // וריאציות
+    $variations = null; $attrs = array();
+    if ($p->is_type('variable')) {
+        $count = count($p->get_children());
+        $threshold = apply_filters('woocommerce_ajax_variation_threshold', 30, $p);
+        $variations = $count <= $threshold ? $p->get_available_variations() : false;
+        if (is_array($variations)) {
+            foreach ($variations as &$v) {
+                foreach (array('price_html', 'availability_html', 'variation_description') as $k) { if (isset($v[$k])) { $v[$k] = chx_rel_html($v[$k]); } }
+            }
+            unset($v);
+        }
+        foreach ($p->get_variation_attributes() as $name => $options) {
+            $list = array();
+            if (taxonomy_exists($name)) {
+                foreach (wc_get_product_terms($id, $name, array('fields' => 'all')) as $t) {
+                    if (in_array($t->slug, $options, true)) { $list[] = array('value' => $t->slug, 'label' => apply_filters('woocommerce_variation_option_name', $t->name, $t, $name, $p)); }
+                }
+            } else {
+                foreach ($options as $o) { $list[] = array('value' => $o, 'label' => apply_filters('woocommerce_variation_option_name', $o, null, $name, $p)); }
+            }
+            $attrs[] = array('name' => $name, 'id' => sanitize_title($name), 'label' => wc_attribute_label($name, $p), 'options' => $list, 'selected' => $p->get_variation_default_attribute($name));
+        }
+    }
+
+    $qty = apply_filters('woocommerce_quantity_input_args', array(
+        'min_value' => apply_filters('woocommerce_quantity_input_min', $p->get_min_purchase_quantity(), $p),
+        'max_value' => apply_filters('woocommerce_quantity_input_max', $p->get_max_purchase_quantity(), $p),
+        'input_value' => $p->get_min_purchase_quantity(),
+        'step' => apply_filters('woocommerce_quantity_input_step', 1, $p),
+    ), $p);
+
+    $cats = array();
+    foreach (wc_get_product_terms($id, 'product_cat', array('orderby' => 'name')) as $t) { $cats[] = array('name' => $t->name, 'link' => chx_rel(get_term_link($t))); }
+    $tags = array();
+    foreach (wc_get_product_terms($id, 'product_tag', array('orderby' => 'name')) as $t) { $tags[] = array('name' => $t->name, 'link' => chx_rel(get_term_link($t))); }
+
+    // תוספות צ'וקי לעמוד המוצר (choci-product-page)
+    $deal = function_exists('choci_deal_for_product') ? choci_deal_for_product($id) : false;
+    $recipe = json_decode(trim((string) get_post_meta($id, '_choci_recipe', true)), true);
+    $faq = json_decode(trim((string) get_post_meta($id, '_choci_faq', true)), true);
+    $compl = array();
+    if (function_exists('choci_pd_complement_ids')) {
+        foreach (choci_pd_complement_ids($p, 12) as $cid) {
+            $cp = wc_get_product($cid);
+            if (!$cp) { continue; }
+            $thumb = get_the_post_thumbnail_url($cid, 'woocommerce_thumbnail');
+            $compl[] = array('name' => get_the_title($cid), 'link' => chx_rel(get_permalink($cid)), 'img' => $thumb ? $thumb : wc_placeholder_img_src(), 'price_html' => chx_rel_html($p ? $cp->get_price_html() : ''));
+        }
+    }
+
+    return array(
+        'id' => $id,
+        'name' => $p->get_name(),
+        'title' => get_the_title($id),
+        'type' => $p->get_type(),
+        'link' => chx_rel($p->get_permalink()),
+        'classes' => wc_get_product_class('', $p),
+        'price_html' => chx_rel_html($p->get_price_html()),
+        'short_html' => chx_rel_html(apply_filters('woocommerce_short_description', $p->get_short_description())),
+        'description_html' => trim((string) $p->get_description()) !== '' ? chx_rel_html(wp_kses_post(wpautop($p->get_description()))) : '',
+        'stock_html' => chx_rel_html(wc_get_stock_html($p)),
+        'purchasable' => $p->is_purchasable(),
+        'in_stock' => $p->is_in_stock(),
+        'sold_individually' => $p->is_sold_individually(),
+        'qty' => $qty,
+        'sku' => $p->get_sku(),
+        'sku_label' => __('SKU:', 'woocommerce'),
+        'cats' => $cats,
+        'cats_label' => _n('Category:', 'Categories:', count($cats), 'woocommerce'),
+        'tags' => $tags,
+        'tags_label' => _n('Tag:', 'Tags:', count($tags), 'woocommerce'),
+        'gallery' => $gallery,
+        'placeholder' => $main_id ? null : wc_placeholder_img_src('woocommerce_single'),
+        'variations' => $variations,
+        'attributes' => $attrs,
+        'badge' => chx_badge($p),
+        'breadcrumbs' => chx_breadcrumbs(),
+        'add_to_cart_text' => $p->single_add_to_cart_text(),
+        'choci' => array(
+            'kosher' => function_exists('choci_pd_kosher_badges') ? choci_pd_kosher_badges($p) : array(),
+            'unit' => (string) get_post_meta($id, '_choci_unit_price', true),
+            'deal' => $deal ? array('label' => $deal['label'], 'qty' => (int) $deal['qty'], 'price_html' => wc_price($deal['price']), 'link' => chx_rel(get_term_link((int) $deal['term_id'], 'product_cat'))) : null,
+            'tip' => trim((string) get_post_meta($id, '_choci_tip', true)),
+            'mascot' => chx_rel((string) get_option('choci_pd_mascot_url', '')),
+            'spec' => function_exists('choci_pd_spec_rows') ? choci_pd_spec_rows($p) : array(),
+            'faq' => is_array($faq) ? $faq : array(),
+            'recipe' => is_array($recipe) && !empty($recipe['title']) ? array_map(function ($v) { return is_string($v) ? chx_rel($v) : $v; }, $recipe) : null,
+            'complements' => $compl,
+        ),
+    );
 }
