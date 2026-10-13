@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '4');
+define('CHX_VERSION', '5');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -552,9 +552,14 @@ function chx_singular() {
         'author' => array('name' => get_the_author_meta('display_name', $a), 'link' => chx_rel(get_author_posts_url($a))),
         'date_iso' => get_the_modified_date('c', $id),
         'date_text' => get_the_date('', $id),
+        'mod_text' => get_the_modified_date('', $id),
         'prev' => $prev ? array('title' => get_the_title($prev), 'link' => chx_rel(get_permalink($prev))) : null,
         'next' => $next ? array('title' => get_the_title($next), 'link' => chx_rel(get_permalink($next))) : null,
         'comments_open' => comments_open($id),
+        'comment_count' => (int) get_comments_number($id),
+        'cat_ids' => is_singular('post') ? wp_get_post_categories($id) : array(),
+        'related' => is_singular('post') ? chx_related_posts($id) : array(),
+        'jsonld' => is_singular('post') ? chx_recipe_jsonld($id) : null,
         'template' => get_page_template_slug($id),
     );
 }
@@ -585,4 +590,66 @@ function chx_home_rails() {
         $out['recipes_all'] = chx_rel(get_permalink(defined('CHOCI_HR_PAGE') ? CHOCI_HR_PAGE : 4252));
     }
     return $out;
+}
+
+/* פוסטים דומים — אותה שאילתה כמו בתבנית */
+function chx_related_posts($id) {
+    if (!function_exists('Kadence\\get_related_posts_args')) { return array(); }
+    $q = new WP_Query(\Kadence\get_related_posts_args($id));
+    $out = array();
+    foreach ($q->posts as $rp) {
+        $rid = $rp->ID;
+        $cats = array();
+        foreach (get_the_category($rid) as $c) { $cats[] = array('name' => $c->name, 'slug' => $c->slug, 'link' => chx_rel(get_category_link($c))); }
+        $a = $rp->post_author;
+        $out[] = array(
+            'id' => $rid,
+            'title' => get_the_title($rid),
+            'link' => chx_rel(get_permalink($rid)),
+            'post_class' => get_post_class('entry content-bg loop-entry', $rid),
+            'img' => has_post_thumbnail($rid) ? chx_img_attrs(get_the_post_thumbnail($rid, 'medium_large')) : null,
+            'cats' => $cats,
+            'author' => array('name' => get_the_author_meta('display_name', $a), 'link' => chx_rel(get_author_posts_url($a))),
+            'pub_iso' => get_the_date('c', $rid), 'pub_text' => get_the_date('', $rid),
+            'mod_iso' => get_the_modified_date('c', $rid), 'mod_text' => get_the_modified_date('', $rid),
+            'excerpt_html' => apply_filters('the_excerpt', get_the_excerpt($rid)),
+        );
+    }
+    wp_reset_postdata();
+    return $out;
+}
+
+/* נתוני מתכון לגוגל (כמו choci-recipe-schema) */
+function chx_recipe_jsonld($id) {
+    if (!function_exists('choci_rb_is_active') || !choci_rb_is_active($id)) { return null; }
+    $rb = get_post_meta($id, '_choci_rb', true);
+    if (!is_array($rb)) { return null; }
+    $ings = array();
+    if (!empty($rb['ing']) && is_array($rb['ing'])) {
+        foreach ($rb['ing'] as $s) { foreach (preg_split('/\\r?\\n/', isset($s['body']) ? $s['body'] : '') as $ln) { $ln = trim($ln); if ($ln !== '') { $ings[] = $ln; } } }
+    }
+    $steps = array();
+    if (!empty($rb['steps']) && is_array($rb['steps'])) {
+        foreach ($rb['steps'] as $s) {
+            $title = isset($s['title']) ? trim($s['title']) : '';
+            foreach (preg_split('/\\r?\\n/', isset($s['body']) ? $s['body'] : '') as $ln) {
+                $ln = trim($ln); if ($ln === '') { continue; }
+                $st = array('@type' => 'HowToStep', 'text' => $ln);
+                if ($title !== '') { $st['name'] = $title; }
+                $steps[] = $st;
+            }
+        }
+    }
+    if (empty($ings) && empty($steps)) { return null; }
+    $d = array('@context' => 'https://schema.org', '@type' => 'Recipe', 'name' => get_the_title($id), 'author' => array('@type' => 'Organization', 'name' => get_bloginfo('name')), 'datePublished' => get_the_date('c', $id));
+    $intro = isset($rb['intro']) ? trim(wp_strip_all_tags($rb['intro'])) : '';
+    if ($intro !== '') { $d['description'] = $intro; } else { $ex = trim(wp_strip_all_tags(get_the_excerpt($id))); if ($ex !== '') { $d['description'] = $ex; } }
+    if (has_post_thumbnail($id)) { $img = wp_get_attachment_image_url(get_post_thumbnail_id($id), 'large'); if ($img) { $d['image'] = array($img); } }
+    if ($ings) { $d['recipeIngredient'] = $ings; }
+    if ($steps) { $d['recipeInstructions'] = $steps; }
+    $y = isset($rb['yield']) ? trim($rb['yield']) : ''; if ($y !== '') { $d['recipeYield'] = $y; }
+    $t = isset($rb['time']) ? $rb['time'] : ''; if ($t !== '' && preg_match('/\\d+/', $t, $m)) { $d['totalTime'] = 'PT' . intval($m[0]) . 'M'; }
+    $d['recipeCategory'] = 'קינוח';
+    $d['recipeCuisine'] = 'קונדיטוריה';
+    return $d;
 }
