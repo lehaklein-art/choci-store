@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '7');
+define('CHX_VERSION', '8');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -20,6 +20,7 @@ function chx_maybe_serve() {
     $what = sanitize_key($_GET['choci_api']);
     try {
         if ($what === 'layout') { $data = chx_layout(); }
+        elseif ($what === 'wish') { $data = chx_wish(); }
         else { $data = chx_page(); }
     } catch (\Throwable $e) {
         status_header(500);
@@ -33,6 +34,29 @@ function chx_rel($url) {
     $home = untrailingslashit(home_url());
     if (is_string($url) && strpos($url, $home) === 0) { $url = substr($url, strlen($home)); return $url === '' ? '/' : $url; }
     return $url;
+}
+
+/* ---------- מועדפים: נתוני המוצרים בלבד (אותה שאילתה כמו choci-wishlist) ---------- */
+function chx_wish() {
+    $ids = isset($_GET['ids']) ? array_map('absint', explode(',', (string) $_GET['ids'])) : array();
+    $ids = array_slice(array_values(array_unique(array_filter($ids))), 0, 100);
+    $items = array();
+    if ($ids) {
+        $q = new WP_Query(array('post_type' => 'product', 'post__in' => $ids, 'posts_per_page' => 100, 'orderby' => 'post__in', 'post_status' => 'publish'));
+        foreach ($q->posts as $post) {
+            $p = wc_get_product($post->ID);
+            if (!$p) { continue; }
+            $items[] = array(
+                'id' => (int) $p->get_id(),
+                'name' => $p->get_name(),
+                'link' => chx_rel(get_permalink($post)),
+                'img' => chx_img_attrs($p->get_image('woocommerce_thumbnail')),
+                'price_html' => chx_rel_html(wp_kses_post($p->get_price_html())),
+                'buy' => $p->is_purchasable() && $p->is_in_stock() && $p->is_type('simple'),
+            );
+        }
+    }
+    return array('items' => $items, 'shop' => chx_rel(wc_get_page_permalink('shop')));
 }
 
 /* ---------- נתונים משותפים לכל העמודים ---------- */

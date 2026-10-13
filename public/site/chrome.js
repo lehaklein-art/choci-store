@@ -186,14 +186,29 @@
   var rm=e.target.closest?e.target.closest('[data-wish-remove]'):null;
   if(rm){ e.preventDefault(); toggle(Number(rm.getAttribute('data-wish-remove'))); load(); return; }
  });
+ function e(v){ return String(v==null?'':v).replace(/&(?!#\d+;|#x[0-9a-f]+;|[a-z][a-z0-9]*;)|[<>"']/gi,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+ function im(a){ if(!a){ return ''; } var h='<img'; for(var k in a){ if(Object.prototype.hasOwnProperty.call(a,k)){ h+=' '+k+'="'+e(a[k])+'"'; } } return h+' />'; }
+ // אותו מבנה כרטיס כמו במועדפים המקוריים
+ function render(items){
+  var h='<div class="cw-grid">';
+  for(var i=0;i<items.length;i++){
+   var p=items[i], l=e(p.link);
+   h+='<div class="cw-card" data-item="'+p.id+'"><button type="button" class="cw-del" data-wish-remove="'+p.id+'" aria-label="הסרה מהמועדפים">&times;</button>'
+    +'<a href="'+l+'">'+im(p.img)+'</a><a class="cw-t" href="'+l+'">'+e(p.name)+'</a><div class="cw-p">'+p.price_html+'</div>';
+   h+=p.buy?'<div class="cadd" data-pid="'+p.id+'"><button type="button" class="cq cq-plus" aria-label="הוספה לסל">+</button><span class="cq-num">0</span><button type="button" class="cq cq-minus" aria-label="הפחתת כמות" disabled>&minus;</button></div>'
+          :'<a class="cw-view" href="'+l+'">לעמוד המוצר</a>';
+   h+='</div>';
+  }
+  return h+'</div>';
+ }
  function load(){
   var host=document.getElementById('choci-wish-page');
   if(!host){ return; }
-  var b=new URLSearchParams(); var ids=read();
-  for(var i=0;i<ids.length;i++){ b.append('ids[]',ids[i]); }
-  fetch(url('choci_wish_items'),{method:'POST',credentials:'same-origin',body:b})
+  var ids=read();
+  if(!ids.length){ host.innerHTML='<p class="cw-empty">עוד לא סימנת מוצרים. מצאת משהו שאהבת? לחצי על הלב שעל המוצר והוא יחכה לך כאן.<br><a class="cw-shop" href="'+e(C.shop||'/shop/')+'">לחנות</a></p>'; return; }
+  fetch('/api/wish?ids='+ids.join(','))
    .then(function(r){return r.json();})
-   .then(function(j){ if(j&&j.success){ host.innerHTML=j.data.html; marks(); } })
+   .then(function(j){ if(j&&j.items){ host.innerHTML=render(j.items); marks(); if(window.__chociCartData&&window.chociCartPaint){ window.chociCartPaint(window.__chociCartData); } } else { throw 0; } })
    .catch(function(){ host.innerHTML='<p class="cw-empty">לא הצלחנו לטעון את המועדפים. נסי לרענן.</p>'; });
  }
  function boot(){ marks(); count(); load(); }
@@ -338,6 +353,7 @@
  function badge(n){var e=document.querySelectorAll('.ico-cart em, .choci-cart-count');for(var i=0;i<e.length;i++){e[i].textContent=n;}}
  function flash(t){var f=document.createElement('div');f.className='ccart-flash';f.textContent=t;document.body.appendChild(f);setTimeout(function(){f.remove();},2200);}
  function paint(d){
+  window.__chociCartData=d;
   var w=dr.querySelector('.ccart-wrap'); if(w){w.innerHTML=d.html;}
   var slot=document.getElementById('choci-bar-slot'); if(slot){slot.innerHTML=d.bar||'';}
   badge(d.count);
@@ -350,7 +366,7 @@
    st[i].classList.remove('is-busy');
   }
  }
- window.chociCartPaint=paint;
+ window.chociCartPaint=function(d){window.__chociCartData=d;paint(d);};
  window.chociCartAdd=function(pid,qty){return post('choci_cart_add',{pid:pid,qty:qty||1}).then(function(j){if(j&&j.success){open();}else{flash('לא הצלחנו להוסיף, נסו שוב');}return j;});};
  function post(action,data,box){
   if(box){box.classList.add('is-busy');}
