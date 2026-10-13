@@ -16,7 +16,7 @@ export async function GET(req) {
   const url = new URL(req.url);
   if (isLive(req, url)) return handle(req);
   if (isNativePath(url.pathname, url.search) && !url.searchParams.has('legacy')) {
-    try { return await serveNative(req, url); } catch (e) { console.error('native /', e?.message); }
+    try { const r = await serveNative(req, url); if (r) return r; } catch (e) { console.error('native /', e?.message); }
   }
   try {
     const key = normKey('/', url.search);

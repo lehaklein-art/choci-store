@@ -1,0 +1,27 @@
+#choci-prods .cp-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#choci-prods .prods[hidden],#choci-prods .card[hidden]{display:none !important}
+#choci-prods .card{display:flex;flex-direction:column}
+#choci-prods .card .fav{position:absolute;left:10px;top:8px;right:auto;background:none;border:0;padding:0;margin:0;line-height:0;color:#EC6560;cursor:pointer;z-index:2}
+#choci-prods .card .fav svg{width:19px;height:19px}
+#choci-prods .card .ph{aspect-ratio:1;margin-bottom:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;text-decoration:none}
+#choci-prods .card .ph.cp-has{background:#fff}
+#choci-prods .card .ph img{width:100%;height:100%;object-fit:contain;display:block}
+#choci-prods .card b{font-weight:400}
+#choci-prods .cp-name{color:#573D2F;text-decoration:none}
+#choci-prods .cp-name:hover{color:#EC6560}
+#choci-prods .price{margin-top:auto;padding-top:8px}
+#choci-prods .price del{color:#A08D85;font-weight:400;font-size:14px;margin-inline-end:6px}
+#choci-prods .price ins{text-decoration:none}
+#choci-prods .price .screen-reader-text{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+#choci-prods .cp-oos{margin-top:8px;font-size:13px;color:#A08D85}
+#choci-prods .cadd{justify-content:flex-start}
+#choci-prods .r-nav[disabled]{opacity:.25;cursor:default}
+#choci-prods .cp-all{display:block;text-align:center;margin-top:26px;color:#573D2F;font-size:15px}
+#choci-prods .cp-all:hover{color:#EC6560}
+#choci-recipes-home .cr-img{display:block}
+#choci-recipes-home .blog article img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+#choci-recipes-home .blog h3 a{color:#fff;text-decoration:none}
+#choci-recipes-home .blog h3 a:hover{text-decoration:underline}
+#choci-recipes-home .blog .more{color:#fff;text-decoration:underline;margin-top:auto;align-self:flex-start}
+#choci-recipes-home .blog .txt{display:flex;flex-direction:column;flex:1}
+#choci-recipes-home .lnk-all:hover{color:#EC6560}

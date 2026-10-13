@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '3');
+define('CHX_VERSION', '4');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -67,6 +67,9 @@ function chx_page() {
     if (function_exists('is_product_category') && (is_product_category() || is_shop() || is_product_tag() || (is_search() && get_query_var('post_type') === 'product'))) {
         $out['type'] = 'archive';
         $out['archive'] = chx_archive();
+    } elseif (is_singular(array('page', 'post')) && !(function_exists('is_cart') && (is_cart() || is_checkout() || is_account_page()))) {
+        $out['type'] = 'singular';
+        $out['singular'] = chx_singular();
     } elseif (function_exists('is_product') && is_product()) {
         $out['type'] = 'product';
         $out['product'] = chx_product(wc_get_product(get_queried_object_id()));
@@ -506,4 +509,80 @@ function chx_product($p) {
             'complements' => $compl,
         ),
     );
+}
+
+/* ---------- עמודים ופוסטים ---------- */
+function chx_singular() {
+    global $wp_query, $post;
+    $content = '';
+    if (have_posts()) {
+        the_post(); // בתוך הלולאה — כמו בעמוד אמיתי, כך שהתוספים מוסיפים את מה שהם מוסיפים
+        $content = apply_filters('the_content', get_the_content());
+        $content = str_replace(']]>', ']]&gt;', $content);
+    }
+    $id = get_the_ID();
+    $rails = array();
+    if (is_front_page()) {
+        // את רצועות המוצרים והמתכונים בונה האתר החדש מנתונים — מסמנים את מקומן
+        $content = preg_replace('#<section class="sec bg-gray prods-sec" id="choci-prods">.*?</section>#s', '<!--CHX:prods-->', $content, 1);
+        $content = preg_replace('#<section class="sec blog-sec" id="choci-recipes-home">.*?</section>#s', '<!--CHX:recipes-->', $content, 1);
+        $rails = chx_home_rails();
+    }
+    $thumb = null;
+    if (is_singular('post') && has_post_thumbnail($id)) {
+        $thumb = chx_img_attrs(get_the_post_thumbnail($id, 'full', array('class' => 'post-top-featured')));
+    }
+    $cats = array();
+    if (is_singular('post')) {
+        foreach (get_the_category($id) as $c) { $cats[] = array('name' => $c->name, 'link' => chx_rel(get_category_link($c))); }
+    }
+    $prev = is_singular('post') ? get_previous_post() : null;
+    $next = is_singular('post') ? get_next_post() : null;
+    $a = get_post_field('post_author', $id);
+    return array(
+        'id' => $id,
+        'post_type' => get_post_type($id),
+        'is_front_page' => is_front_page(),
+        'title' => get_the_title($id),
+        'post_class' => get_post_class('entry content-bg single-entry', $id),
+        'content_html' => chx_rel_html($content),
+        'rails' => $rails,
+        'thumb' => $thumb,
+        'cats' => $cats,
+        'author' => array('name' => get_the_author_meta('display_name', $a), 'link' => chx_rel(get_author_posts_url($a))),
+        'date_iso' => get_the_modified_date('c', $id),
+        'date_text' => get_the_date('', $id),
+        'prev' => $prev ? array('title' => get_the_title($prev), 'link' => chx_rel(get_permalink($prev))) : null,
+        'next' => $next ? array('title' => get_the_title($next), 'link' => chx_rel(get_permalink($next))) : null,
+        'comments_open' => comments_open($id),
+        'template' => get_page_template_slug($id),
+    );
+}
+
+function chx_home_rails() {
+    $out = array('tabs' => array(), 'recipes' => array(), 'shop' => chx_rel(wc_get_page_permalink('shop')), 'recipes_all' => '');
+    if (function_exists('choci_hp_ids')) {
+        foreach (array('new' => 'חדשים', 'sale' => 'מבצעים', 'best' => 'הכי נמכרים') as $slug => $label) {
+            $cards = array();
+            foreach (choci_hp_ids($slug) as $pid) {
+                $p = wc_get_product($pid);
+                if (!$p || !$p->is_visible()) { continue; }
+                $cards[] = array(
+                    'id' => $pid, 'name' => $p->get_name(), 'link' => chx_rel(get_permalink($pid)),
+                    'img' => $p->get_image_id() ? chx_img_attrs($p->get_image('woocommerce_thumbnail', array('loading' => 'lazy', 'alt' => ''))) : null,
+                    'buy' => $p->is_purchasable() && $p->is_in_stock(),
+                    'price_html' => chx_rel_html(wp_kses_post($p->get_price_html())),
+                );
+            }
+            if ($cards) { $out['tabs'][] = array('slug' => $slug, 'label' => $label, 'cards' => $cards); }
+        }
+    }
+    if (function_exists('choci_hr_ids')) {
+        foreach (choci_hr_ids() as $rid) {
+            $img = get_the_post_thumbnail($rid, 'medium_large', array('alt' => ''));
+            $out['recipes'][] = array('title' => get_the_title($rid), 'link' => chx_rel(get_permalink($rid)), 'excerpt' => function_exists('choci_hr_excerpt') ? choci_hr_excerpt($rid) : '', 'img' => $img ? chx_img_attrs($img) : array('src' => wc_placeholder_img_src('medium_large'), 'alt' => '', 'loading' => 'lazy'));
+        }
+        $out['recipes_all'] = chx_rel(get_permalink(defined('CHOCI_HR_PAGE') ? CHOCI_HR_PAGE : 4252));
+    }
+    return $out;
 }

@@ -12,7 +12,7 @@ async function GET(req) {
   const url = new URL(req.url);
   if (isLive(req, url) || /\.[a-z0-9]{2,5}$/i.test(url.pathname)) return handle(req);
   if (isNativePath(url.pathname, url.search) && !url.searchParams.has('legacy')) {
-    try { return await serveNative(req, url); } catch (e) { console.error('native', url.pathname, e?.message); }
+    try { const r = await serveNative(req, url); if (r) return r; } catch (e) { console.error('native', url.pathname, e?.message); }
   }
   try {
     const key = normKey(url.pathname, url.search);
