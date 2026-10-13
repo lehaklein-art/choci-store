@@ -19,7 +19,9 @@ let css = '';
 let full = '';
 let note = '';
 try {
-  full = (await get(`${ORIGIN}/wp-content/uploads/choci-export/site.css?b=${Date.now()}`)).replace(/@import\s+url\([^)]*\);?\s*/g, '');
+  full = (await get(`${ORIGIN}/wp-content/uploads/choci-export/site.css?b=${Date.now()}`)).replace(/@import\s+url\([^)]*\);?\s*/g, '')
+    // סימן BOM בתחילת קבצים (בלתי נראה) — בתוך קובץ מאוחד הוא שובר את הכלל הראשון של כל קובץ
+    .replace(/\uFEFF/g, '');
   if (!full) throw new Error('no source css');
   const pages = [];
   for (const p of SAMPLE_PATHS) pages.push(await get(ORIGIN + p).catch(() => ''));
