@@ -1,0 +1,122 @@
+:root{
+  --brown:#573D2F; --brown-d:#3D2B20; --coral:#EC6560; --coral-d:#C4322D; --cream:#FAF6F4;
+  --ink:#2a1d16; --muted:#7A6459; --line:#eadfd9; --white:#fff; --green:#1F7A46;
+  --radius:14px; --wrap:1240px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Heebo,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.55}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 16px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* כותרת עליונה */
+.hdr{background:var(--brown);color:#fff;position:sticky;top:0;z-index:50}
+.hdr-top{display:flex;align-items:center;gap:14px;height:64px}
+.hdr-logo img{height:44px;width:auto}
+.hdr-search{flex:1;max-width:460px;margin-inline-start:auto;display:flex;background:#fff;border-radius:999px;overflow:hidden}
+.hdr-search input{flex:1;border:0;outline:0;padding:10px 16px;font:inherit;font-size:15px;color:var(--ink);min-width:0}
+.hdr-search button{border:0;background:var(--coral);color:#fff;padding:0 16px;font-weight:700}
+.hdr-cart{display:flex;align-items:center;gap:6px;font-weight:700;white-space:nowrap}
+.hdr-nav{border-top:1px solid rgba(255,255,255,.12)}
+.hdr-nav ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
+.hdr-nav ul::-webkit-scrollbar{display:none}
+.hdr-nav a{display:block;padding:11px 14px;font-weight:600;font-size:15px;white-space:nowrap;border-radius:8px}
+.hdr-nav a:hover{background:rgba(255,255,255,.1)}
+.hdr-nav .sale{color:#ffd2cf}
+
+/* דף הבית */
+.hero{position:relative;overflow:hidden;background:var(--brown-d)}
+.hero img{width:100%;height:auto;aspect-ratio:2400/667;object-fit:cover}
+.hero-txt{position:absolute;inset:0;display:flex;align-items:center}
+.sec{padding:36px 0}
+.h-sec{font-size:26px;font-weight:800;margin:0 0 18px;color:var(--brown)}
+.h-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.h-row a{color:var(--coral-d);font-weight:700;font-size:15px}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.cat{background:#fff;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);transition:transform .15s,box-shadow .15s}
+.cat:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(61,43,32,.1)}
+.cat img{aspect-ratio:1/1;object-fit:cover;width:100%;height:auto;background:var(--cream)}
+.cat span{display:block;padding:10px 12px;font-weight:700;text-align:center;font-size:15px}
+.club{background:var(--coral);color:#fff;border-radius:var(--radius);padding:26px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.club h2{margin:0;font-size:24px}
+.club p{margin:4px 0 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:11px 22px;font-weight:700;background:var(--coral);color:#fff;transition:background .15s}
+.btn:hover{background:var(--coral-d)}
+.btn-light{background:#fff;color:var(--coral-d)}
+.btn-light:hover{background:#fff3f2}
+
+/* כרטיסי מוצר */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;position:relative;transition:box-shadow .15s}
+.card:hover{box-shadow:0 8px 22px rgba(61,43,32,.1)}
+.card-img{aspect-ratio:1/1;background:var(--cream);display:block}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.card-b{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card-t{font-weight:700;font-size:15px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+.price{font-weight:800;color:var(--brown);font-size:17px}
+.price del{color:var(--muted);font-weight:500;font-size:14px;margin-inline-start:6px}
+.badge{position:absolute;top:10px;inset-inline-start:10px;background:var(--coral);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px}
+.card .btn{margin-top:auto;padding:9px 14px;font-size:14px}
+.oos{color:var(--muted);font-size:14px;margin-top:auto}
+
+/* קטגוריה */
+.crumbs{font-size:14px;color:var(--muted);padding:14px 0 0}
+.crumbs a:hover{color:var(--coral-d)}
+.cat-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 18px}
+.cat-head h1{margin:0;font-size:30px;color:var(--brown)}
+.cat-head small{color:var(--muted)}
+.subcats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.subcats a{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+.subcats a:hover{border-color:var(--coral)}
+.pager{display:flex;gap:6px;justify-content:center;margin:28px 0 8px;flex-wrap:wrap}
+.pager a,.pager span{min-width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#fff;border:1px solid var(--line);font-weight:700}
+.pager span{background:var(--brown);color:#fff;border-color:var(--brown)}
+
+/* עמוד מוצר */
+.pd{display:grid;grid-template-columns:1fr 1fr;gap:36px;padding:16px 0 36px}
+.pd-gal{background:#fff;border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;align-self:start}
+.pd-gal img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#fff}
+.pd-thumbs{display:flex;gap:8px;padding:8px;overflow-x:auto}
+.pd-thumbs img{width:70px;height:70px;border-radius:8px;border:1px solid var(--line);object-fit:cover}
+.pd h1{font-size:28px;line-height:1.25;margin:0 0 10px;color:var(--brown-d)}
+.pd .price{font-size:26px}
+.pd-short{margin:14px 0;color:#4b3a31}
+.pd-buy{display:flex;gap:10px;align-items:center;margin:18px 0}
+.pd-buy .btn{padding:14px 30px;font-size:17px}
+.pd-meta{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.pd-meta a{color:var(--coral-d)}
+.pd-attrs{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px;margin:14px 0}
+.pd-attrs dt{font-weight:700;color:var(--brown)}
+.pd-attrs dd{margin:0}
+.pd-desc{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px;margin-bottom:30px}
+.pd-desc h2{margin-top:0;color:var(--brown)}
+.ship-note{background:#fff;border:1px dashed var(--coral);border-radius:12px;padding:10px 14px;font-size:14px;margin-top:10px}
+
+/* כותרת תחתונה */
+.ftr{background:var(--brown-d);color:#e9dcd4;margin-top:40px;padding:34px 0;font-size:15px}
+.ftr-in{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px}
+.ftr h3{color:#fff;margin:0 0 8px;font-size:17px}
+.ftr a{display:block;padding:3px 0;color:#e9dcd4}
+.ftr a:hover{color:#fff}
+.ftr-bottom{text-align:center;color:#b8a59a;font-size:13px;margin-top:24px}
+
+@media (max-width:760px){
+  .hdr-top{height:auto;flex-wrap:wrap;gap:8px 10px;padding:8px 0}
+  .hdr-logo img{height:36px}
+  .hdr-search{order:3;flex-basis:100%;max-width:none;margin:0}
+  .hdr-cart{margin-inline-start:auto}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .card-b{padding:10px}
+  .card-t{font-size:14px}
+  .cats{grid-template-columns:repeat(3,1fr);gap:8px}
+  .cat span{font-size:13px;padding:8px 6px}
+  .pd{grid-template-columns:1fr;gap:18px}
+  .pd h1{font-size:23px}
+  .cat-head h1{font-size:24px}
+  .sec{padding:24px 0}
+  .h-sec{font-size:21px}
+  .pd-desc{padding:16px}
+}

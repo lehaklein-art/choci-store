@@ -1,0 +1,143 @@
+[
+ {
+  "id": 1891,
+  "name": "אבקת איבוק פנינה לאסטר",
+  "slug": "%d7%90%d7%91%d7%a7%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7-%d7%a4%d7%a0%d7%99%d7%a0%d7%94-%d7%9c%d7%90%d7%a1%d7%98%d7%a8",
+  "permalink": "https://choci.kinsta.cloud/product/%d7%90%d7%91%d7%a7%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7-%d7%a4%d7%a0%d7%99%d7%a0%d7%94-%d7%9c%d7%90%d7%a1%d7%98%d7%a8/",
+  "sku": "9204085",
+  "type": "simple",
+  "prices": {
+   "price": "1890",
+   "regular_price": "1890",
+   "currency_minor_unit": 2
+  },
+  "on_sale": false,
+  "is_in_stock": true,
+  "is_purchasable": true,
+  "images": [
+   {
+    "src": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-dust-1891.webp",
+    "thumbnail": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-dust-1891-300x300.webp",
+    "alt": "אבקת איבוק פנינה לאסטר"
+   }
+  ],
+  "categories": [
+   {
+    "id": 17,
+    "name": "נצנצים ואבקות איבוק",
+    "link": "https://choci.kinsta.cloud/product-category/cake-decorations/%d7%a0%d7%a6%d7%a0%d7%a6%d7%99%d7%9d-%d7%95%d7%90%d7%91%d7%a7%d7%95%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7/"
+   },
+   {
+    "id": 19,
+    "name": "צבעי מאכל",
+    "link": "https://choci.kinsta.cloud/product-category/raw-materials/%d7%a6%d7%91%d7%a2%d7%99-%d7%9e%d7%90%d7%9b%d7%9c/"
+   }
+  ],
+  "short_description": "<p>אבקה מטאלית לצביעה חיצונית. כשרות בד\"ץ העדה החרדית. תכולה: 10 סמ\"ק</p>",
+  "description": "",
+  "attributes": [
+   {
+    "name": "צבע",
+    "terms": [
+     {
+      "name": "לבן"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": 1890,
+  "name": "אבקת איבוק זהב קיסר",
+  "slug": "%d7%90%d7%91%d7%a7%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7-%d7%96%d7%94%d7%91-%d7%a7%d7%99%d7%a1%d7%a8",
+  "permalink": "https://choci.kinsta.cloud/product/%d7%90%d7%91%d7%a7%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7-%d7%96%d7%94%d7%91-%d7%a7%d7%99%d7%a1%d7%a8/",
+  "sku": "9204079",
+  "type": "simple",
+  "prices": {
+   "price": "1890",
+   "regular_price": "1890",
+   "currency_minor_unit": 2
+  },
+  "on_sale": false,
+  "is_in_stock": true,
+  "is_purchasable": true,
+  "images": [
+   {
+    "src": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-dust-1890.webp",
+    "thumbnail": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-dust-1890-300x300.webp",
+    "alt": "אבקת איבוק זהב קיסר"
+   }
+  ],
+  "categories": [
+   {
+    "id": 17,
+    "name": "נצנצים ואבקות איבוק",
+    "link": "https://choci.kinsta.cloud/product-category/cake-decorations/%d7%a0%d7%a6%d7%a0%d7%a6%d7%99%d7%9d-%d7%95%d7%90%d7%91%d7%a7%d7%95%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7/"
+   },
+   {
+    "id": 19,
+    "name": "צבעי מאכל",
+    "link": "https://choci.kinsta.cloud/product-category/raw-materials/%d7%a6%d7%91%d7%a2%d7%99-%d7%9e%d7%90%d7%9b%d7%9c/"
+   }
+  ],
+  "short_description": "<p>אבקה מטאלית לצביעה חיצונית. כשרות בד\"ץ העדה החרדית. תכולה: 10 סמ\"ק</p>",
+  "description": "",
+  "attributes": [
+   {
+    "name": "צבע",
+    "terms": [
+     {
+      "name": "לבן"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": 1889,
+  "name": "אבקת איבוק אדום ארגמן",
+  "slug": "%d7%90%d7%91%d7%a7%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7-%d7%90%d7%93%d7%95%d7%9d-%d7%90%d7%a8%d7%92%d7%9e%d7%9f",
+  "permalink": "https://choci.kinsta.cloud/product/%d7%90%d7%91%d7%a7%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7-%d7%90%d7%93%d7%95%d7%9d-%d7%90%d7%a8%d7%92%d7%9e%d7%9f/",
+  "sku": "9204075",
+  "type": "simple",
+  "prices": {
+   "price": "1890",
+   "regular_price": "1890",
+   "currency_minor_unit": 2
+  },
+  "on_sale": false,
+  "is_in_stock": true,
+  "is_purchasable": true,
+  "images": [
+   {
+    "src": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-dust-1889.webp",
+    "thumbnail": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-dust-1889-300x300.webp",
+    "alt": "אבקת איבוק אדום ארגמן"
+   }
+  ],
+  "categories": [
+   {
+    "id": 17,
+    "name": "נצנצים ואבקות איבוק",
+    "link": "https://choci.kinsta.cloud/product-category/cake-decorations/%d7%a0%d7%a6%d7%a0%d7%a6%d7%99%d7%9d-%d7%95%d7%90%d7%91%d7%a7%d7%95%d7%aa-%d7%90%d7%99%d7%91%d7%95%d7%a7/"
+   },
+   {
+    "id": 19,
+    "name": "צבעי מאכל",
+    "link": "https://choci.kinsta.cloud/product-category/raw-materials/%d7%a6%d7%91%d7%a2%d7%99-%d7%9e%d7%90%d7%9b%d7%9c/"
+   }
+  ],
+  "short_description": "<p>אבקה מטאלית לצביעה חיצונית. כשרות בד\"ץ העדה החרדית. תכולה: 10 סמ\"ק</p>",
+  "description": "",
+  "attributes": [
+   {
+    "name": "צבע",
+    "terms": [
+     {
+      "name": "לבן"
+     }
+    ]
+   }
+  ]
+ }
+]

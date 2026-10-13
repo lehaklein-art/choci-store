@@ -1,0 +1,62 @@
+[
+ {
+  "id": 134,
+  "name": "חומרי גלם",
+  "slug": "raw-materials",
+  "parent": 0,
+  "count": 427,
+  "image": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/b143ae9dc0d02430e4d14c9985fc01b7-300x300.png",
+  "path": "/product-category/raw-materials/",
+  "description": ""
+ },
+ {
+  "id": 122,
+  "name": "קישוטים לעוגה",
+  "slug": "cake-decorations",
+  "parent": 0,
+  "count": 361,
+  "image": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-cat-122-300x300.png",
+  "path": "/product-category/cake-decorations/",
+  "description": ""
+ },
+ {
+  "id": 135,
+  "name": "תבניות ורינגים",
+  "slug": "molds-rings",
+  "parent": 0,
+  "count": 211,
+  "image": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-cat-135-300x300.png",
+  "path": "/product-category/molds-rings/",
+  "description": ""
+ },
+ {
+  "id": 316,
+  "name": "מבצעים",
+  "slug": "מבצעים",
+  "parent": 0,
+  "count": 132,
+  "image": "",
+  "path": "/product-category/מבצעים/",
+  "description": ""
+ },
+ {
+  "id": 19,
+  "name": "צבעי מאכל",
+  "slug": "צבעי-מאכל",
+  "parent": 134,
+  "count": 116,
+  "image": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-cat-19-300x300.webp",
+  "path": "/product-category/raw-materials/צבעי-מאכל/",
+  "description": ""
+ },
+ {
+  "id": 17,
+  "name": "נצנצים ואבקות איבוק",
+  "slug": "נצנצים-ואבקות-איבוק",
+  "parent": 122,
+  "count": 37,
+  "image": "https://choci.kinsta.cloud/wp-content/uploads/2026/08/choci-cat-17-300x300.webp",
+  "path": "/product-category/cake-decorations/נצנצים-ואבקות-איבוק/",
+  "description": ""
+ }
+]
