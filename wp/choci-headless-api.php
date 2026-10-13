@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '5');
+define('CHX_VERSION', '6');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -67,6 +67,9 @@ function chx_page() {
     if (function_exists('is_product_category') && (is_product_category() || is_shop() || is_product_tag() || (is_search() && get_query_var('post_type') === 'product'))) {
         $out['type'] = 'archive';
         $out['archive'] = chx_archive();
+    } elseif ((is_home() || is_category() || is_tag() || is_author() || is_date()) && !is_front_page()) {
+        $out['type'] = 'posts';
+        $out['posts'] = chx_posts_archive();
     } elseif (is_singular(array('page', 'post')) && !(function_exists('is_cart') && (is_cart() || is_checkout() || is_account_page()))) {
         $out['type'] = 'singular';
         $out['singular'] = chx_singular();
@@ -597,12 +600,17 @@ function chx_related_posts($id) {
     if (!function_exists('Kadence\\get_related_posts_args')) { return array(); }
     $q = new WP_Query(\Kadence\get_related_posts_args($id));
     $out = array();
-    foreach ($q->posts as $rp) {
+    foreach ($q->posts as $rp) { $out[] = chx_post_card($rp); }
+    wp_reset_postdata();
+    return $out;
+}
+
+function chx_post_card($rp) {
         $rid = $rp->ID;
         $cats = array();
         foreach (get_the_category($rid) as $c) { $cats[] = array('name' => $c->name, 'slug' => $c->slug, 'link' => chx_rel(get_category_link($c))); }
         $a = $rp->post_author;
-        $out[] = array(
+        return array(
             'id' => $rid,
             'title' => get_the_title($rid),
             'link' => chx_rel(get_permalink($rid)),
@@ -614,9 +622,6 @@ function chx_related_posts($id) {
             'mod_iso' => get_the_modified_date('c', $rid), 'mod_text' => get_the_modified_date('', $rid),
             'excerpt_html' => apply_filters('the_excerpt', get_the_excerpt($rid)),
         );
-    }
-    wp_reset_postdata();
-    return $out;
 }
 
 /* נתוני מתכון לגוגל (כמו choci-recipe-schema) */
@@ -664,4 +669,19 @@ function chx_extra_jsonld() {
         foreach ($m[1] as $j) { $d = json_decode(trim($j), true); if ($d) { $out[] = $d; } }
     }
     return $out;
+}
+
+/* ארכיון פוסטים (קטגוריית מתכונים וכו') */
+function chx_posts_archive() {
+    global $wp_query;
+    $cards = array();
+    foreach ($wp_query->posts as $p) { $cards[] = chx_post_card($p); }
+    $term = get_queried_object();
+    return array(
+        'title' => wp_strip_all_tags(get_the_archive_title()),
+        'description_html' => chx_rel_html(get_the_archive_description()),
+        'cards' => $cards,
+        'paged' => max(1, (int) get_query_var('paged')),
+        'max_pages' => (int) $wp_query->max_num_pages,
+    );
 }
