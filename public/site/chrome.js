@@ -351,6 +351,7 @@
   }
  }
  window.chociCartPaint=paint;
+ window.chociCartAdd=function(pid,qty){return post('choci_cart_add',{pid:pid,qty:qty||1}).then(function(j){if(j&&j.success){open();}else{flash('לא הצלחנו להוסיף, נסו שוב');}return j;});};
  function post(action,data,box){
   if(box){box.classList.add('is-busy');}
   var b=new URLSearchParams(); for(var k in data){b.append(k,data[k]);}

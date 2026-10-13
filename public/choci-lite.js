@@ -186,6 +186,7 @@
     window.addEventListener('resize', size);
     slides.forEach(function (s) { var im = s.querySelector('img'); if (im && !im.complete) im.addEventListener('load', function () { place(false); }); });
     size(); go(0);
+    gallery.__go = go;
     return function () { return cur; };
   }
   function gallery(g) {

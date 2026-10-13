@@ -411,8 +411,8 @@ function chx_product($p) {
     $main_id = $p->get_image_id();
     $ids = $p->get_gallery_image_ids();
     if ($main_id) {
-        $gallery[] = chx_gallery_item($main_id, true, 0, $p);
-        foreach ($ids as $i => $gid) { $gallery[] = chx_gallery_item($gid, false, $i + 1, $p); }
+        $gallery[] = chx_gallery_item($main_id, true, -1, $p);
+        foreach ($ids as $i => $gid) { $gallery[] = chx_gallery_item($gid, false, $i, $p); }
     }
 
     // וריאציות
