@@ -135,11 +135,23 @@
       li.appendChild(t); thumbs.appendChild(li);
     });
     gallery.appendChild(thumbs);
-    var nav = d.createElement('ul'); nav.className = 'flex-direction-nav';
-    nav.innerHTML = '<li class="flex-nav-prev"><a class="flex-prev" href="#">Previous</a></li><li class="flex-nav-next"><a class="flex-next" href="#">Next</a></li>';
-    viewport.appendChild(nav);
-    nav.querySelector('.flex-prev').addEventListener('click', function (e) { e.preventDefault(); go(cur - 1); });
-    nav.querySelector('.flex-next').addEventListener('click', function (e) { e.preventDefault(); go(cur + 1); });
+    var F = P.flexslider || {};
+    var loop = F.animationLoop !== false;
+    var nav = null;
+    if (F.directionNav) {
+      nav = d.createElement('ul'); nav.className = 'flex-direction-nav';
+      var pa = d.createElement('a'); pa.className = 'flex-prev'; pa.href = '#'; pa.textContent = F.prevText || 'Previous';
+      var na = d.createElement('a'); na.className = 'flex-next'; na.href = '#'; na.textContent = F.nextText || 'Next';
+      var pl = d.createElement('li'); pl.className = 'flex-nav-prev'; pl.appendChild(pa);
+      var nl = d.createElement('li'); nl.className = 'flex-nav-next'; nl.appendChild(na);
+      nav.appendChild(pl); nav.appendChild(nl);
+      // כמו במקור: החיצים בסוף הגלריה, אחרי התמונות הקטנות
+      gallery.appendChild(nav);
+    }
+    if (nav) {
+      nav.querySelector('.flex-prev').addEventListener('click', function (e) { e.preventDefault(); go(cur - 1); });
+      nav.querySelector('.flex-next').addEventListener('click', function (e) { e.preventDefault(); go(cur + 1); });
+    }
     function size() {
       var w = viewport.getBoundingClientRect().width;
       wrapper.style.width = (slides.length * 100 + 100) + '%';
@@ -154,7 +166,12 @@
       var h = slides[cur].getBoundingClientRect().height; if (h) viewport.style.height = h + 'px';
     }
     function go(i) {
+      if (!loop && (i < 0 || i >= slides.length)) return;
       cur = (i + slides.length) % slides.length;
+      if (nav && !loop) {
+        nav.querySelector('.flex-prev').classList.toggle('flex-disabled', cur === 0);
+        nav.querySelector('.flex-next').classList.toggle('flex-disabled', cur === slides.length - 1);
+      }
       slides.forEach(function (s, k) { s.classList.toggle('flex-active-slide', k === cur); });
       $$('img', thumbs).forEach(function (t, k) { t.classList.toggle('flex-active', k === cur); });
       place(true);
