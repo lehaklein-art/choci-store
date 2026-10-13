@@ -5,7 +5,7 @@ Description: נקודת נתונים לחלון הראווה החדש (Next.js).
 */
 if (!defined('ABSPATH')) { exit; }
 
-define('CHX_VERSION', '1');
+define('CHX_VERSION', '2');
 
 /* הבקשה עוברת דרך וורדפרס כמו עמוד רגיל — אותה שאילתה, אותם סינונים, אותו מיון, אותן הפניות.
    רק במקום לבנות HTML, מחזירים את הנתונים. */
@@ -44,6 +44,9 @@ function chx_layout() {
         'footer_html' => (string) get_option('choci_global_footer', ''),
         'nonce_cart'  => wp_create_nonce('choci_cart'),
         'nonce_wish'  => wp_create_nonce('choci_wish'),
+        'nonce_club'  => wp_create_nonce('choci_club'),
+        // העיצוב שנשמר בהגדרות האתר (Customizer) — כך שינויי עיצוב שנעשים שם ממשיכים לעבוד
+        'custom_css'  => wp_strip_all_tags(wp_get_custom_css()),
         'wishlist_url'=> chx_rel($wish_page ? get_permalink($wish_page) : home_url('/wishlist/')),
         'shop_url'    => chx_rel(wc_get_page_permalink('shop')),
         'cart_url'    => chx_rel(wc_get_cart_url()),
