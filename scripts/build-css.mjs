@@ -2,6 +2,8 @@
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { PurgeCSS } from 'purgecss';
+import postcss from 'postcss';
+import safeParser from 'postcss-safe-parser';
 import { SAMPLE_PATHS, SAFELIST } from '../lib/css-config.mjs';
 
 const ORIGIN = (process.env.WC_URL || 'https://choci.kinsta.cloud').replace(/\/+$/, '');
@@ -25,25 +27,20 @@ try {
   if (ok.length < SAMPLE_PATHS.length - 3) throw new Error(`only ${ok.length} sample pages`);
   // כללים שבורים במקור (למשל &gt; במקום >) — הדפדפן מתעלם מהם גם באתר המקורי, אז מסירים אותם כדי שהמראה יישאר זהה
   let src = full.replace(/[^{}]*&(gt|lt|amp);[^{}]*\{[^{}]*\}/g, '');
-  let res;
-  for (let tries = 0; ; tries++) {
-    try {
-      res = await new PurgeCSS().purge({
-        content: ok.map((raw) => ({ raw, extension: 'html' })),
-        css: [{ raw: src }],
-        safelist: SAFELIST, fontFace: false, keyframes: false, variables: false,
-      });
-      break;
-    } catch (e) {
-      const m = /:(\d+):(\d+):/.exec(e.message || '');
-      if (!m || tries > 30) throw e;
-      const lines = src.split('\n');
-      console.warn('[css] dropping unparsable line', m[1], (lines[+m[1] - 1] || '').slice(0, 80));
-      lines.splice(+m[1] - 1, 1);
-      src = lines.join('\n');
-    }
-  }
+  // קריאה סלחנית (כמו שהדפדפן קורא): כלל שבור מדולג, ושאר הקובץ נשמר
+  src = postcss().process(src, { parser: safeParser, from: undefined }).css;
+  const res = await new PurgeCSS().purge({
+    content: ok.map((raw) => ({ raw, extension: 'html' })),
+    css: [{ raw: src }],
+    safelist: SAFELIST, fontFace: false, keyframes: false, variables: false,
+  });
   css = res.map((r) => r.css).join('\n');
+  // בדיקת ביטחון: כללים חיוניים חייבים להישאר, אחרת משתמשים בעיצוב המלא
+  const must = ['.kadence-shop-top-row', '.primary-sidebar', '.hdr', '.choci-pd-item>summary', '.woocommerce-product-gallery', 'ul.products', '.price_slider', '.choci-rail', '#ca-btn', '.ftr'];
+  const missing = must.filter((m) => !css.includes(m));
+  if (missing.length) throw new Error('missing ' + missing.join(' '));
+  const ratio = css.length / full.length;
+  if (ratio < 0.3) throw new Error('too small ' + ratio.toFixed(2));
   note = `lean ${Math.round(full.length / 1024)}->${Math.round(css.length / 1024)}KB from ${ok.length} pages`;
   console.log('[css]', note);
 } catch (e) {

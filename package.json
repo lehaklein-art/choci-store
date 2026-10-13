@@ -10,6 +10,8 @@
   "dependencies": {
     "next": "15.3.4",
     "node-html-parser": "^6.1.13",
+    "postcss": "^8.4.49",
+    "postcss-safe-parser": "^7.0.1",
     "purgecss": "^6.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
