@@ -23,11 +23,26 @@ try {
   for (const p of SAMPLE_PATHS) pages.push(await get(ORIGIN + p).catch(() => ''));
   const ok = pages.filter((x) => x.length > 5000);
   if (ok.length < SAMPLE_PATHS.length - 3) throw new Error(`only ${ok.length} sample pages`);
-  const res = await new PurgeCSS().purge({
-    content: ok.map((raw) => ({ raw, extension: 'html' })),
-    css: [{ raw: full }],
-    safelist: SAFELIST, fontFace: false, keyframes: false, variables: false,
-  });
+  // כללים שבורים במקור (למשל &gt; במקום >) — הדפדפן מתעלם מהם גם באתר המקורי, אז מסירים אותם כדי שהמראה יישאר זהה
+  let src = full.replace(/[^{}]*&(gt|lt|amp);[^{}]*\{[^{}]*\}/g, '');
+  let res;
+  for (let tries = 0; ; tries++) {
+    try {
+      res = await new PurgeCSS().purge({
+        content: ok.map((raw) => ({ raw, extension: 'html' })),
+        css: [{ raw: src }],
+        safelist: SAFELIST, fontFace: false, keyframes: false, variables: false,
+      });
+      break;
+    } catch (e) {
+      const m = /:(\d+):(\d+):/.exec(e.message || '');
+      if (!m || tries > 30) throw e;
+      const lines = src.split('\n');
+      console.warn('[css] dropping unparsable line', m[1], (lines[+m[1] - 1] || '').slice(0, 80));
+      lines.splice(+m[1] - 1, 1);
+      src = lines.join('\n');
+    }
+  }
   css = res.map((r) => r.css).join('\n');
   note = `lean ${Math.round(full.length / 1024)}->${Math.round(css.length / 1024)}KB from ${ok.length} pages`;
   console.log('[css]', note);
